@@ -1,0 +1,70 @@
+version: "3"
+
+services:
+  producer:
+    image: ntdesmond/tv-lab5-producer:latest
+    build:
+      dockerfile: ./docker/producer.Dockerfile
+      context: ./
+    restart: on-failure
+    environment:
+      - AMQP_HOST=rabbitmq
+      - AMQP_USER=admin
+      - AMQP_PASS=admin
+    depends_on:
+      - rabbitmq
+      - postgres
+    deploy:
+      resources:
+        limits:
+          cpus: '0.2'
+          memory: 200M
+
+  consumer:
+    image: ntdesmond/tv-lab5-consumer:latest
+    build:
+      dockerfile: ./docker/consumer.Dockerfile
+      context: ./
+    restart: on-failure
+    environment:
+      - POSTGRES_DB=db
+      - POSTGRES_USER=db
+      - POSTGRES_PASS=db
+      - POSTGRES_HOST=postgres
+      - AMQP_HOST=rabbitmq
+      - AMQP_USER=admin
+      - AMQP_PASS=admin
+    depends_on:
+      - rabbitmq
+      - postgres
+    deploy:
+      resources:
+        limits:
+          cpus: '0.2'
+          memory: 200M
+
+  rabbitmq:
+    image: rabbitmq:management
+    environment:
+      RABBITMQ_DEFAULT_USER: admin
+      RABBITMQ_DEFAULT_PASS: admin
+    ports:
+      - "127.0.0.1:5672:5672"  # For testing purposes
+      - "127.0.0.1:15672:15672"
+
+  postgres:
+    image: postgres:latest
+    environment:
+      POSTGRES_USER: db
+      POSTGRES_PASSWORD: db
+    ports:
+      - "127.0.0.1:5432:5432"  # For testing purposes
+
+  pgadmin:
+    image: dpage/pgadmin4
+    restart: always
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@admin.com
+      PGADMIN_DEFAULT_PASSWORD: admin
+    ports:
+      - "127.0.0.1:8080:80"
