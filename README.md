@@ -1,3 +1,5 @@
+See the code in <https://github.com/ntdesmond/tv-lab5-rabbitmq>.
+
 # Task 1
 
 ![nothing](https://i.gifer.com/7TOb.gif)
